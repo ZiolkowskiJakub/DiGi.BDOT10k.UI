@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="8.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DiGi.BDOT10k">
+      <HintPath>..\references\DiGi.BDOT10k.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Core">
+      <HintPath>..\references\DiGi.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Geometry">
+      <HintPath>..\references\DiGi.Geometry.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Geometry.Object">
+      <HintPath>..\references\DiGi.Geometry.Object.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Geometry.Visual">
+      <HintPath>..\references\DiGi.Geometry.Visual.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.GML">
+      <HintPath>..\references\DiGi.GML.dll</HintPath>
+    </Reference>
+    <Reference Include="DiGi.Math">
+      <HintPath>..\references\DiGi.Math.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
