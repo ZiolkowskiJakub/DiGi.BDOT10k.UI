@@ -5,8 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DiGi.BDOT10k.UI.Application"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="300" Width="150">
     <Grid>
+        <Button x:Name="Load" Content="Load" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" Width="130" Click="Load_Click"/>
+        <Button x:Name="Convert" Content="Convert" HorizontalAlignment="Center" Margin="0,35,0,0" VerticalAlignment="Top" Width="130" Click="Convert_Click"/>
 
     </Grid>
 </Window>
