@@ -22,6 +22,9 @@
     <Reference Include="DiGi.Geometry">
       <HintPath>..\references\DiGi.Geometry.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.Geometry.Object">
+      <HintPath>..\references\DiGi.Geometry.Object.dll</HintPath>
+    </Reference>
     <Reference Include="DiGi.Geometry.Visual">
       <HintPath>..\references\DiGi.Geometry.Visual.dll</HintPath>
     </Reference>

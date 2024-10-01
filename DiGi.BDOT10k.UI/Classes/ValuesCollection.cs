@@ -21,6 +21,19 @@ namespace DiGi.BDOT10k.UI.Classes
             list.Add(values);
         }
 
+        public void AddRange(IEnumerable<Values> values)
+        {
+            if(values == null)
+            {
+                return;
+            }
+
+            foreach (Values values_Temp in values)
+            {
+                Add(values_Temp);
+            }
+        }
+
         public IEnumerator<Values> GetEnumerator()
         {
             return list == null ? new List<Values>().GetEnumerator() : list?.GetEnumerator();

@@ -32,7 +32,7 @@ namespace DiGi.BDOT10k.UI.Classes
             return true;
         }
 
-        public List<T> GetObiektyGeometryczne<T>(Func<T, bool> func = null)
+        public List<T> GetObiektyGeometryczne<T>(Func<T, bool> func = null) where T : IObiektGeometryczny
         {
             if(dictionary == null)
             {
@@ -70,6 +70,43 @@ namespace DiGi.BDOT10k.UI.Classes
             }
 
             return result;
+        }
+
+        public T GetObiektGeometryczny<T>(Func<T, bool> func = null) where T : IObiektGeometryczny
+        {
+            if (dictionary == null)
+            {
+                return default;
+            }
+
+            Type type = typeof(T);
+
+            foreach (KeyValuePair<Type, List<IObiektGeometryczny>> keyValuePair in dictionary)
+            {
+                if (!type.IsAssignableFrom(keyValuePair.Key))
+                {
+                    continue;
+                }
+
+                foreach (IObiektGeometryczny obiektGeometryczny in keyValuePair.Value)
+                {
+                    if (!(obiektGeometryczny is T))
+                    {
+                        continue;
+                    }
+
+                    T t = (T)obiektGeometryczny;
+
+                    if (func != null && !func.Invoke(t))
+                    {
+                        continue;
+                    }
+
+                    return t;
+                }
+            }
+
+            return default;
         }
     }
 }

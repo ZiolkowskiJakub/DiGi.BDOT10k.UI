@@ -8,7 +8,7 @@ namespace DiGi.BDOT10k.UI.Classes
 {
     public abstract class PowierzchniowyObiektGeometryczny<T> : VisualPolygonalFace2D, IObiektGeometryczny<PolygonalFace2D, ISurfaceAppearance> where T: IOT_PowierzchniowyObiektGeometryczny
     {
-        private T oT_PowierzchniowyObiektGeometryczny;
+        protected T oT_PowierzchniowyObiektGeometryczny;
 
         private double area = double.NaN;
         private BoundingBox2D boundingBox2D = null;

@@ -9,5 +9,13 @@ namespace DiGi.BDOT10k.UI.Classes
             : base(oT_PowierzchniowyObiektGeometryczny, surfaceAppearance)
         {
         }
+
+        public uint? liczbaMieszkancow
+        {
+            get
+            {
+                return oT_PowierzchniowyObiektGeometryczny?.liczbaMieszkancow;
+            }
+        }
     }
 }

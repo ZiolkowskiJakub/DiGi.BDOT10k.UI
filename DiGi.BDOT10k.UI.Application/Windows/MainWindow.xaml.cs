@@ -2,7 +2,6 @@
 using System.Windows;
 using DiGi.BDOT10k.UI.Classes;
 using DiGi.BDOT10k.Classes;
-using DiGi.Geometry.Planar.Classes;
 using System.IO.Compression;
 using System.IO;
 
@@ -22,7 +21,7 @@ namespace DiGi.BDOT10k.UI.Application.Windows
             OT_ADMS_A oT_ADMS_A = null;
         }
 
-        private void Load_New()
+        private void Convert_New()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "zip files (*.zip)|*.zip|All files (*.*)|*.*";
@@ -34,21 +33,80 @@ namespace DiGi.BDOT10k.UI.Application.Windows
 
             string path = openFileDialog.FileName;
 
+            string directory = Path.GetDirectoryName(path);
+            directory = Path.Combine(directory, "Results");
+            if(!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            string fileName = "progressReport.txt";
+
+            File.AppendAllText(Path.Combine(directory, fileName), string.Format("[{0}] {1}\n", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"), "START"));
+
             using (ZipArchive zipArchive = ZipFile.OpenRead(path))
             {
                 foreach (ZipArchiveEntry zipArchiveEntry in zipArchive.Entries)
                 {
-                    Stream stream = zipArchiveEntry.Open();
-                    using (ZipArchive zipArchive_ZipArchieve = new ZipArchive(stream))
+                    DeflateStream deflateStream = zipArchiveEntry.Open() as DeflateStream;
+                    if(deflateStream == null)
+                    {
+                        continue;
+                    }
+
+                    using (ZipArchive zipArchive_ZipArchieve = new ZipArchive(deflateStream))
                     {
                         foreach (ZipArchiveEntry zipArchiveEntry_Zip in zipArchive_ZipArchieve.Entries)
                         {
-                            string name = zipArchiveEntry_Zip.Name;
-                            string fullName = zipArchiveEntry_Zip.FullName;
-                        }
+                            File.AppendAllText(Path.Combine(directory, fileName), string.Format("[{0}] {1} -> {2}\n", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"), zipArchiveEntry.Name, zipArchiveEntry_Zip.Name));
+
+                            string path_Data = Path.Combine(directory, Path.GetFileNameWithoutExtension(zipArchiveEntry_Zip.Name) + ".txt");
+                            if(File.Exists(path_Data))
+                            {
+                                continue;
+                            }
+
+                            DeflateStream deflateStream_Zip = zipArchiveEntry_Zip.Open() as DeflateStream;
+                            if(deflateStream_Zip == null)
+                            {
+                                continue;
+                            }
+
+                            ZipArchive zipArchive_Files = new ZipArchive(deflateStream_Zip);
+
+                            SlownikObiektowGeometrycznych slownikObiektowGeometrycznych = new SlownikObiektowGeometrycznych();
+
+                            foreach (ZipArchiveEntry zipArchiveEntry_File in zipArchive_Files.Entries)
+                            {
+                                if (zipArchiveEntry_File.Name.EndsWith("__OT_ADMS_A.xml") || zipArchiveEntry_File.Name.EndsWith("__OT_BUBD_A.xml"))
+                                {
+                                    slownikObiektowGeometrycznych.Load(zipArchiveEntry_File.Open());
+                                }
+                            }
+
+
+                            string path_Report = Path.Combine(directory, string.Format("{0}_{1}", Path.GetFileNameWithoutExtension(zipArchiveEntry_Zip.Name), "Report") + ".txt");
+
+                            if (slownikObiektowGeometrycznych.GetObiektGeometryczny<BUBD_A>() == null || slownikObiektowGeometrycznych.GetObiektGeometryczny<ADMS_A>() == null)
+                            {
+                                File.WriteAllText(path, string.Empty);
+                            }
+                            else
+                            {
+                                Report report = new Report();
+                                ValuesCollection valuesCollection = slownikObiektowGeometrycznych.ToDiGi(report);
+                                valuesCollection?.Write(path_Data);
+                                if (!report.IsEmpty())
+                                {
+                                    report.Write(path_Report);
+                                }
+                            }
+                        };
                     }
                 }
             }
+
+            File.AppendAllText(Path.Combine(directory, fileName), string.Format("[{0}] {1}\n", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"), "END"));
         }
 
         private void Load_Old() 
@@ -72,12 +130,7 @@ namespace DiGi.BDOT10k.UI.Application.Windows
             slownikObiektowGeometrycznych.Load(path);
         }
 
-        private void Load_Click(object sender, RoutedEventArgs e)
-        {
-            Load_New();
-        }
-
-        private void Convert_Click(object sender, RoutedEventArgs e)
+        private void Convert_Old()
         {
             OpenFolderDialog openFolderDialog = new OpenFolderDialog();
             bool? result = openFolderDialog.ShowDialog(this);
@@ -86,160 +139,19 @@ namespace DiGi.BDOT10k.UI.Application.Windows
                 return;
             }
 
-            List<ADMS_A> ADMS_As = slownikObiektowGeometrycznych.GetObiektyGeometryczne<ADMS_A>();
+            ValuesCollection valuesCollection = slownikObiektowGeometrycznych.ToDiGi();
 
-            List<Tuple<string, ADMS_A, List<BUBD_A>>> tuples = new List<Tuple<string, ADMS_A, List<BUBD_A>>>();
+            valuesCollection.Write(Path.Combine(openFolderDialog.FolderName, "result.txt"));
+        }
 
-            List<BUBD_A> BUBD_As = slownikObiektowGeometrycznych.GetObiektyGeometryczne<BUBD_A>();
-            foreach (BUBD_A bUBD_A in BUBD_As)
-            {
-                OT_BUBD_A oT_BUBD_A = bUBD_A.OT_PowierzchniowyObiektGeometryczny;
-                if (oT_BUBD_A == null)
-                {
-                    continue;
-                }
+        private void Load_Click(object sender, RoutedEventArgs e)
+        {
+            Load_Old();
+        }
 
-                if (oT_BUBD_A.funkcjaOgolnaBudynku != Enums.OT_FunOgolnaBudynku.budynki_mieszkalne)
-                {
-                    continue;
-                }
-
-                if (oT_BUBD_A.funkcjaSzczegolowaBudynku == null)
-                {
-                    continue;
-                }
-
-                if(!oT_BUBD_A.funkcjaSzczegolowaBudynku.Contains(Enums.OT_FunSzczegolowaBudynkuType.budynek_jednorodzinny) && !oT_BUBD_A.funkcjaSzczegolowaBudynku.Contains(Enums.OT_FunSzczegolowaBudynkuType.budynek_wielorodzinny))
-                {
-                    continue;
-                }
-
-                if (oT_BUBD_A.kategoriaIstnienia != Enums.OT_KatIstnienia.eksploatowany)
-                {
-                    continue;
-                }
-
-                Point2D point2D = bUBD_A.InternalPoint2D;
-                if(point2D == null)
-                {
-                    continue;
-                }
-
-                List<ADMS_A> aDMS_As_BUBD_A = ADMS_As.FindAll(x => x.BoundingBox2D.InRange(point2D) && x.Geometry.InRange(point2D));
-                if(aDMS_As_BUBD_A == null || BUBD_As.Count == 0)
-                {
-                    throw new NotImplementedException();
-                }
-                else
-                {
-                    if (aDMS_As_BUBD_A.Count > 1)
-                    {
-                        aDMS_As_BUBD_A.Sort((x, y) => x.Area.CompareTo(y.Area));
-                    }
-
-                    ADMS_A aDMS_A = aDMS_As_BUBD_A[0];
-
-                    OT_ADMS_A oT_ADMS_A = aDMS_A.OT_PowierzchniowyObiektGeometryczny;
-                    if (oT_ADMS_A == null)
-                    {
-                        throw new NotImplementedException();
-                    } 
-                    else
-                    {
-                        string uniqueId = oT_ADMS_A.identyfikatorSIMC;
-
-                        Tuple<string, ADMS_A, List<BUBD_A>> tuple = tuples.Find(x => x.Item1 == uniqueId);
-                        if (tuple == null)
-                        {
-                            tuple = new Tuple<string, ADMS_A, List<BUBD_A>>(uniqueId, aDMS_A, new List<BUBD_A>());
-                            tuples.Add(tuple);
-                        }
-
-                        tuple.Item3.Add(bUBD_A);
-                    }
-                }
-            }
-
-            ValuesCollection valuesCollection = new ValuesCollection();
-            foreach(Tuple<string, ADMS_A, List<BUBD_A>> tuple in tuples)
-            {
-                OT_ADMS_A oT_ADMS_A = tuple?.Item2?.OT_PowierzchniowyObiektGeometryczny;
-                if(oT_ADMS_A == null || oT_ADMS_A.liczbaMieszkancow == null || !oT_ADMS_A.liczbaMieszkancow.HasValue)
-                {
-                    throw new NotImplementedException();
-                }
-
-                uint liczbaMieszkancow = oT_ADMS_A.liczbaMieszkancow.Value;
-                double area = 0;
-                foreach(BUBD_A bUBD_A in tuple.Item3)
-                {
-                    area += bUBD_A.Area * bUBD_A.OT_PowierzchniowyObiektGeometryczny.liczbaKondygnacji.Value;
-                }
-
-                double factor = liczbaMieszkancow / area;
-
-                Dictionary<BUBD_A, int> dictionary = new Dictionary<BUBD_A, int>();
-
-                int count = 0;
-                foreach (BUBD_A bUBD_A in tuple.Item3)
-                {
-                    int count_BUBD_A = System.Convert.ToInt32(Math.Floor(bUBD_A.Area * factor));
-                    if(count + count_BUBD_A > liczbaMieszkancow)
-                    {
-                        count_BUBD_A = System.Convert.ToInt32(liczbaMieszkancow) - count;
-                    }
-
-                    dictionary[bUBD_A] = count_BUBD_A;
-                    count += count_BUBD_A;
-
-                    if (count >= liczbaMieszkancow)
-                    {
-                        break;
-                    }
-                }
-
-                if(count < liczbaMieszkancow)
-                {
-                    Random random = new Random((int)liczbaMieszkancow);
-
-                    Core.Classes.Range<int> range = new Core.Classes.Range<int>(0, tuple.Item3.Count - 1);
-
-                    while(count < liczbaMieszkancow)
-                    {
-                        int index = Core.Query.Random(random, range);
-                        dictionary[tuple.Item3[index]]++;
-                        count++;
-                    }
-                }
-
-                foreach (BUBD_A bUBD_A in tuple.Item3)
-                {
-                    OT_BUBD_A oT_BUBD_A = bUBD_A.OT_PowierzchniowyObiektGeometryczny;
-
-                    Values values = new Values();
-                    values["przestrzenNazw"] = oT_BUBD_A.przestrzenNazw;
-                    values["kodKarto10k"] = oT_BUBD_A.kodKarto10k;
-                    values["identyfikatorEGiB"] = oT_BUBD_A.identyfikatorEGiB?.FirstOrDefault();
-                    values["liczbaKondygnacji"] = oT_BUBD_A.liczbaKondygnacji;
-                    values["funkcjaOgolnaBudynku"] = oT_BUBD_A.funkcjaOgolnaBudynku == null ? null : GML.Query.Description(oT_BUBD_A.funkcjaOgolnaBudynku);
-                    values["przewazajacaFunkcjaBudynku"] = oT_BUBD_A.przewazajacaFunkcjaBudynku == null ? null : GML.Query.Description(oT_BUBD_A.przewazajacaFunkcjaBudynku);
-                    values["funkcjaSzczegolowaBudynku"] = oT_BUBD_A.funkcjaSzczegolowaBudynku == null ? null : string.Join(";", oT_BUBD_A.funkcjaSzczegolowaBudynku?.ConvertAll(x => GML.Query.Description(x)));
-
-                    values["lokalizacjaX"] = Math.Round(bUBD_A.InternalPoint2D.X, 2);
-                    values["lokalizacjaY"] = Math.Round(bUBD_A.InternalPoint2D.Y, 2);
-                    values["powierzchniaPiętra"] = Math.Round(bUBD_A.Area, 2);
-                    values["powierzchnia"] = bUBD_A.Area * oT_BUBD_A.liczbaKondygnacji;
-                    values["liczbaMieszkancowBudynku"] = dictionary[bUBD_A];
-
-                    values["miejscowosc"] = oT_ADMS_A.nazwa;
-                    values["rodzajMiejscowosci"] = GML.Query.Description(oT_ADMS_A.rodzaj);
-                    values["liczbaMieszkancow"] = oT_ADMS_A.liczbaMieszkancow;
-
-                    valuesCollection.Add(values);
-                }
-            }
-
-            valuesCollection.Write(System.IO.Path.Combine(openFolderDialog.FolderName, "result.txt"));
+        private void Convert_Click(object sender, RoutedEventArgs e)
+        {
+            Convert_New();
         }
     }
 }
