@@ -91,7 +91,6 @@ namespace DiGi.BDOT10k.UI.Application.Windows
                                 }
                             }
 
-
                             string path_Report = Path.Combine(directory, string.Format("{0}_{1}", Path.GetFileNameWithoutExtension(zipArchiveEntry_Zip.Name), "Report") + ".txt");
 
                             if (slownikObiektowGeometrycznych.GetObiektGeometryczny<BUBD_A>() == null || slownikObiektowGeometrycznych.GetObiektGeometryczny<ADMS_A>() == null)
@@ -186,13 +185,9 @@ namespace DiGi.BDOT10k.UI.Application.Windows
                     }
 
                     string path_Orto = Path.Combine(directory_Orto, string.Format("{0}.jpeg", keyValuePair.Key));
-                    using (MemoryStream memoryStream = new MemoryStream(keyValuePair.Value))
+                    using (Stream memoryStream = new MemoryStream(keyValuePair.Value), fileStream = new FileStream(path_Orto, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
                     {
-                        System.Drawing.Image image = System.Drawing.Image.FromStream(memoryStream);
-                        if (image != null)
-                        {
-                            image.Save(path_Orto);
-                        }
+                        await memoryStream.CopyToAsync(fileStream);
                     }
                 }
             }
