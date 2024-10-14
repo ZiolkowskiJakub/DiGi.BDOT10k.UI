@@ -1,5 +1,4 @@
-﻿using DiGi.BDOT10k.UI.Application;
-using DiGi.BDOT10k.UI.Application.Windows;
+﻿using DiGi.BDOT10k.UI.Application.Windows;
 using System.Windows;
 
 namespace DiGi.BDOT10k.UI.Application

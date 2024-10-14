@@ -3,6 +3,9 @@ using DiGi.BDOT10k.UI.Classes;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using DiGi.Geometry.Planar.Classes;
+using System.Net.Http;
+using System.IO;
 
 namespace DiGi.BDOT10k.UI
 {

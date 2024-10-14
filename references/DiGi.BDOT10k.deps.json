@@ -9,9 +9,8 @@
     ".NETStandard,Version=v2.0/": {
       "DiGi.BDOT10k/1.0.0": {
         "dependencies": {
-          "DiGi.GML": "1.0.0",
           "NETStandard.Library": "2.0.3",
-          "DiGi.GML.Reference": "1.0.0.0"
+          "DiGi.GML": "1.0.0.0"
         },
         "runtime": {
           "DiGi.BDOT10k.dll": {}
@@ -23,7 +22,7 @@
           "Microsoft.NETCore.Platforms": "1.1.0"
         }
       },
-      "DiGi.GML.Reference/1.0.0.0": {
+      "DiGi.GML/1.0.0.0": {
         "runtime": {
           "DiGi.GML.dll": {
             "assemblyVersion": "1.0.0.0",
@@ -53,7 +52,7 @@
       "path": "netstandard.library/2.0.3",
       "hashPath": "netstandard.library.2.0.3.nupkg.sha512"
     },
-    "DiGi.GML.Reference/1.0.0.0": {
+    "DiGi.GML/1.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

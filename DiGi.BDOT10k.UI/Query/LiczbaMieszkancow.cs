@@ -1,9 +1,5 @@
-﻿using DiGi.BDOT10k.Interfaces;
-using DiGi.BDOT10k.UI.Classes;
-using DiGi.BDOT10k.UI.Interfaces;
-using DiGi.Geometry.Planar.Classes;
+﻿using DiGi.BDOT10k.UI.Classes;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DiGi.BDOT10k.UI
 {

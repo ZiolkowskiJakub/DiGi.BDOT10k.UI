@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="8.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\DiGi.BDOT10k.UI\DiGi.BDOT10k.UI.csproj" />
   </ItemGroup>
 

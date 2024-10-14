@@ -23,7 +23,7 @@ namespace DiGi.BDOT10k.UI
 
             List<ADMS_A> aDMS_As_Temp = new List<ADMS_A>(aDMS_As);
 
-            List<ADMS_A> aDMS_As_BUBD_A = aDMS_As_Temp.FindAll(x => x.BoundingBox2D.InRange(point2D) && x.Geometry.InRange(point2D));
+            List<ADMS_A> aDMS_As_BUBD_A = aDMS_As_Temp.FindAll(x => x?.BoundingBox2D != null && x.BoundingBox2D.InRange(point2D) && x.Geometry.InRange(point2D));
 
             if (aDMS_As_BUBD_A == null || aDMS_As_BUBD_A.Count == 0)
             {

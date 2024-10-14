@@ -1,7 +1,6 @@
 ﻿using DiGi.BDOT10k.Interfaces;
 using DiGi.BDOT10k.UI.Classes;
 using DiGi.BDOT10k.UI.Interfaces;
-using DiGi.Core.Classes;
 using DiGi.GML.Classes;
 using DiGi.GML.Interfaces;
 using System.Collections.Generic;

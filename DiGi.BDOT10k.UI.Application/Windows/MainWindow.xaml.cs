@@ -4,6 +4,13 @@ using DiGi.BDOT10k.UI.Classes;
 using DiGi.BDOT10k.Classes;
 using System.IO.Compression;
 using System.IO;
+using DiGi.Geometry.Planar.Classes;
+using System.Net.Http;
+using DiGi.Geometry.Spatial.Classes;
+using System.Globalization;
+using System.Windows.Controls;
+using System.Drawing.Imaging;
+using System.Collections;
 
 namespace DiGi.BDOT10k.UI.Application.Windows
 {
@@ -109,7 +116,7 @@ namespace DiGi.BDOT10k.UI.Application.Windows
             File.AppendAllText(Path.Combine(directory, fileName), string.Format("[{0}] {1}\n", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"), "END"));
         }
 
-        private void Load_Old() 
+        private async Task<bool> Load_Old() 
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "xml files (*.xml)|*.xml|All files (*.*)|*.*";
@@ -117,18 +124,83 @@ namespace DiGi.BDOT10k.UI.Application.Windows
             bool? result = openFileDialog.ShowDialog(this);
             if (result == null || !result.HasValue || !result.Value)
             {
-                return;
+                return false;
             }
 
             string path = openFileDialog.FileName;
 
-            if (string.IsNullOrWhiteSpace(path) || !System.IO.File.Exists(path))
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
             {
-                return;
+                return false;
             }
 
             slownikObiektowGeometrycznych.Load(path);
+
+            Core.Classes.Range<int> range = new Core.Classes.Range<int>(2001, 2023);
+            string directory = Path.GetDirectoryName(path);
+
+            directory = Path.Combine(directory, "Results");
+            if(!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            directory = Path.Combine(directory, Path.GetFileNameWithoutExtension(path));
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            List<BUBD_A> bUBD_As = slownikObiektowGeometrycznych.GetObiektyGeometryczne<BUBD_A>();
+            foreach(BUBD_A bUBD_A in bUBD_As)
+            {
+                string? id = bUBD_A.OT_PowierzchniowyObiektGeometryczny.identyfikatorEGiB?.FirstOrDefault();
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    continue;
+                }
+
+                Dictionary<int, byte[]> dictionary = await Query.BytesDictionary(bUBD_A, range); 
+                if(dictionary == null)
+                {
+                    continue;
+                }
+
+                string directory_BUBD_A = Path.Combine(directory, id);
+                if (!Directory.Exists(directory_BUBD_A))
+                {
+                    Directory.CreateDirectory(directory_BUBD_A);
+                }
+
+                string directory_Orto = Path.Combine(directory_BUBD_A, "orto");
+                if (!Directory.Exists(directory_Orto))
+                {
+                    Directory.CreateDirectory(directory_Orto);
+                }
+
+                foreach (KeyValuePair<int, byte[]> keyValuePair in dictionary)
+                {
+                    if(keyValuePair.Value == null)
+                    {
+                        continue;
+                    }
+
+                    string path_Orto = Path.Combine(directory_Orto, string.Format("{0}.jpeg", keyValuePair.Key));
+                    using (MemoryStream memoryStream = new MemoryStream(keyValuePair.Value))
+                    {
+                        System.Drawing.Image image = System.Drawing.Image.FromStream(memoryStream);
+                        if (image != null)
+                        {
+                            image.Save(path_Orto);
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
+
+
 
         private void Convert_Old()
         {
@@ -149,9 +221,9 @@ namespace DiGi.BDOT10k.UI.Application.Windows
             Load_Old();
         }
 
-        private void Convert_Click(object sender, RoutedEventArgs e)
+        private async void Convert_Click(object sender, RoutedEventArgs e)
         {
-            Convert_New();
+            await Load_Old();
         }
     }
 }
