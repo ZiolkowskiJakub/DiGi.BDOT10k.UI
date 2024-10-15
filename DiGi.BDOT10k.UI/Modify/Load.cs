@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace DiGi.BDOT10k.UI
 {
-    public static partial class Create
+    public static partial class Modify
     {
         public static bool Load(this SlownikObiektowGeometrycznych slownikObiektowGeometrycznych, Stream stream)
         {

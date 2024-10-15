@@ -1,13 +1,10 @@
 ﻿using DiGi.BDOT10k.UI.Classes;
 using DiGi.Core.Classes;
-using DiGi.Core.Interfaces;
 using DiGi.Geometry.Planar.Classes;
-using DiGi.Geometry.Spatial.Classes;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -17,6 +14,27 @@ namespace DiGi.BDOT10k.UI
     {
         public static async Task<Dictionary<int, byte[]>> BytesDictionary(this BUBD_A bUBD_A, Range<int> years, double offset = 5, double width = 300)
         {
+            if(bUBD_A == null || years == null)
+            {
+                return null;
+            }
+
+            List<int> years_Temp = new List<int>();
+            for (int i = years.Min; i <= years.Max; i++)
+            {
+                years_Temp.Add(i);
+            }
+
+            return await BytesDictionary(bUBD_A, years_Temp, offset, width);
+        }
+
+        public static async Task<Dictionary<int, byte[]>> BytesDictionary(this BUBD_A bUBD_A, IEnumerable<int> years, double offset = 5, double width = 300)
+        {
+            if(years == null)
+            {
+                return null;
+            }
+
             BoundingBox2D boundingBox2D = bUBD_A?.BoundingBox2D;
             if (boundingBox2D == null || boundingBox2D.GetArea() < 1)
             {
@@ -25,10 +43,8 @@ namespace DiGi.BDOT10k.UI
 
             boundingBox2D.Offset(offset);
 
-            BoundingBox3D boundingBox3D = Convert.ToEPSG4326(boundingBox2D);
-
-            Point2D min = new Point2D(boundingBox3D.Min.X, boundingBox3D.Min.Y);
-            Point2D max = new Point2D(boundingBox3D.Max.X, boundingBox3D.Max.Y);
+            Point2D min = boundingBox2D.Min;
+            Point2D max = boundingBox2D.Max;
 
             double deltaX = max.X - min.X;
             double deltaY = max.Y - min.Y;
@@ -36,11 +52,11 @@ namespace DiGi.BDOT10k.UI
             int width_Int = System.Convert.ToInt32(width);
             int height_Int = System.Convert.ToInt32(width / deltaX * deltaY);
 
-            Func<int, Task<byte[]>> func = new Func<int, Task<byte[]>>(async year => 
+            Func<int, Task<byte[]>> func = new Func<int, Task<byte[]>>(async year =>
             {
                 using (HttpClient httpClient = new HttpClient())
                 {
-                    string url = string.Format("https://mapy.geoportal.gov.pl/wss/service/PZGIK/ORTO/WMS/StandardResolutionTime?REQUEST=GetMap&TRANSPARENT=TRUE&FORMAT=image%2Fjpeg&VERSION=1.1.0&LAYERS=Raster&STYLES=&EXCEPTIONS=application%2Fvnd.ogc.se_xml&TIME={0}&SRS=EPSG%3A4326&width={1}&height={2}&SERVICE=WMS&BBOX={3},{4},{5},{6}", year, width_Int, height_Int, min.X.ToString(CultureInfo.InvariantCulture), min.Y.ToString(CultureInfo.InvariantCulture), max.X.ToString(CultureInfo.InvariantCulture), max.Y.ToString(CultureInfo.InvariantCulture));
+                    string url = string.Format("https://mapy.geoportal.gov.pl/wss/service/PZGIK/ORTO/WMS/StandardResolutionTime?REQUEST=GetMap&TRANSPARENT=TRUE&FORMAT=image%2Fjpeg&VERSION=1.1.0&LAYERS=Raster&STYLES=&EXCEPTIONS=application%2Fvnd.ogc.se_xml&TIME={0}&SRS=EPSG:2180&width={1}&height={2}&SERVICE=WMS&BBOX={3},{4},{5},{6}", year, width_Int, height_Int, min.X.ToString(CultureInfo.InvariantCulture), min.Y.ToString(CultureInfo.InvariantCulture), max.X.ToString(CultureInfo.InvariantCulture), max.Y.ToString(CultureInfo.InvariantCulture));
 
                     try
                     {
@@ -64,21 +80,22 @@ namespace DiGi.BDOT10k.UI
                     }
                 }
 
-                return null; 
+                return null;
             });
 
             List<Task<byte[]>> tasks = new List<Task<byte[]>>();
             List<int> years_Temp = new List<int>();
-            for (int i = years.Min; i <= years.Max; i++)
+
+            foreach (int year in years)
             {
-                years_Temp.Add(i);
-                tasks.Add(func(i));
+                years_Temp.Add(year);
+                tasks.Add(func(year));
             }
 
             byte[][] bytesArray = await Task.WhenAll(tasks);
 
             Dictionary<int, byte[]> result = new Dictionary<int, byte[]>();
-            for(int i = 0; i < bytesArray.Length; i++)
+            for (int i = 0; i < bytesArray.Length; i++)
             {
                 result[years_Temp[i]] = bytesArray[i];
             }
