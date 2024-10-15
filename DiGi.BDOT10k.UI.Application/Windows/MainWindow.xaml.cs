@@ -27,64 +27,64 @@ namespace DiGi.BDOT10k.UI.Application.Windows
             OT_ADMS_A oT_ADMS_A = null;
         }
 
-        private async Task<bool> Load_Old() 
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "xml files (*.xml)|*.xml|All files (*.*)|*.*";
+        //private async Task<bool> Load_Old() 
+        //{
+        //    OpenFileDialog openFileDialog = new OpenFileDialog();
+        //    openFileDialog.Filter = "xml files (*.xml)|*.xml|All files (*.*)|*.*";
 
-            bool? result = openFileDialog.ShowDialog(this);
-            if (result == null || !result.HasValue || !result.Value)
-            {
-                return false;
-            }
+        //    bool? result = openFileDialog.ShowDialog(this);
+        //    if (result == null || !result.HasValue || !result.Value)
+        //    {
+        //        return false;
+        //    }
 
-            string path = openFileDialog.FileName;
+        //    string path = openFileDialog.FileName;
 
-            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
-            {
-                return false;
-            }
+        //    if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+        //    {
+        //        return false;
+        //    }
 
-            SlownikObiektowGeometrycznych slownikObiektowGeometrycznych = new SlownikObiektowGeometrycznych();
-            slownikObiektowGeometrycznych.Load(path);
+        //    SlownikObiektowGeometrycznych slownikObiektowGeometrycznych = new SlownikObiektowGeometrycznych();
+        //    slownikObiektowGeometrycznych.Load(path);
 
-            Core.Classes.Range<int> range = new Core.Classes.Range<int>(2001, 2023);
-            string directory = Path.GetDirectoryName(path);
+        //    Core.Classes.Range<int> range = new Core.Classes.Range<int>(2001, 2023);
+        //    string directory = Path.GetDirectoryName(path);
 
-            directory = Path.Combine(directory, "Results");
-            if(!Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
+        //    directory = Path.Combine(directory, "Results");
+        //    if (!Directory.Exists(directory))
+        //    {
+        //        Directory.CreateDirectory(directory);
+        //    }
 
-            directory = Path.Combine(directory, Path.GetFileNameWithoutExtension(path));
-            if (!Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
+        //    directory = Path.Combine(directory, Path.GetFileNameWithoutExtension(path));
+        //    if (!Directory.Exists(directory))
+        //    {
+        //        Directory.CreateDirectory(directory);
+        //    }
 
-            await Modify.Write(slownikObiektowGeometrycznych, directory, range);
+        //    await Modify.Write(slownikObiektowGeometrycznych, directory, range);
 
-            return true;
-        }
+        //    return true;
+        //}
 
         private async void Convert_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "zip files (*.zip)|*.zip|All files (*.*)|*.*";
-            bool? result = openFileDialog.ShowDialog(this);
-            if (result == null || !result.HasValue || !result.Value)
-            {
-                return;
-            }
+            //OpenFileDialog openFileDialog = new OpenFileDialog();
+            //openFileDialog.Filter = "zip files (*.zip)|*.zip|All files (*.*)|*.*";
+            //bool? result = openFileDialog.ShowDialog(this);
+            //if (result == null || !result.HasValue || !result.Value)
+            //{
+            //    return;
+            //}
 
-            string path = openFileDialog.FileName;
-            if(string.IsNullOrWhiteSpace(path) || !File.Exists(path))
-            {
-                return;
-            }
+            //string path = openFileDialog.FileName;
+            //if(string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            //{
+            //    return;
+            //}
 
-            await Modify.Write(path, new Core.Classes.Range<int>(2001, 2023));
+            //await Modify.Write(path, new Core.Classes.Range<int>(2001, 2023));
         }
     }
 }
