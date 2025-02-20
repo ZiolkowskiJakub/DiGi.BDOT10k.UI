@@ -7,16 +7,14 @@
   "targets": {
     ".NETStandard,Version=v2.0": {},
     ".NETStandard,Version=v2.0/": {
-      "DiGi.Geometry.Visual/1.0.0": {
+      "DiGi.Geometry.Object/1.0.0": {
         "dependencies": {
+          "DiGi.Geometry": "1.0.0",
           "NETStandard.Library": "2.0.3",
-          "System.Text.Json": "9.0.0",
-          "DiGi.Core": "1.0.0.0",
-          "DiGi.Geometry": "1.0.0.0",
-          "DiGi.Geometry.Object": "1.0.0.0"
+          "DiGi.Core": "1.0.0.0"
         },
         "runtime": {
-          "DiGi.Geometry.Visual.dll": {}
+          "DiGi.Geometry.Object.dll": {}
         }
       },
       "Microsoft.Bcl.AsyncInterfaces/9.0.0": {
@@ -30,10 +28,37 @@
           }
         }
       },
+      "Microsoft.CSharp/4.7.0": {
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.CSharp.dll": {
+            "assemblyVersion": "4.0.5.0",
+            "fileVersion": "4.700.19.56404"
+          }
+        }
+      },
       "Microsoft.NETCore.Platforms/1.1.0": {},
       "NETStandard.Library/2.0.3": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0"
+        }
+      },
+      "NetTopologySuite/2.5.0": {
+        "dependencies": {
+          "System.Memory": "4.5.5"
+        },
+        "runtime": {
+          "lib/netstandard2.0/NetTopologySuite.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          }
+        }
+      },
+      "QuikGraph/2.5.0": {
+        "runtime": {
+          "lib/netstandard2.0/QuikGraph.dll": {
+            "assemblyVersion": "2.5.0.0",
+            "fileVersion": "2.5.0.0"
+          }
         }
       },
       "System.Buffers/4.5.1": {
@@ -127,15 +152,13 @@
           }
         }
       },
-      "DiGi.Core/1.0.0.0": {
-        "runtime": {
-          "DiGi.Core.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        }
-      },
-      "DiGi.Geometry/1.0.0.0": {
+      "DiGi.Geometry/1.0.0": {
+        "dependencies": {
+          "Microsoft.CSharp": "4.7.0",
+          "NetTopologySuite": "2.5.0",
+          "QuikGraph": "2.5.0",
+          "System.Text.Json": "9.0.0"
+        },
         "runtime": {
           "DiGi.Geometry.dll": {
             "assemblyVersion": "1.0.0.0",
@@ -143,9 +166,9 @@
           }
         }
       },
-      "DiGi.Geometry.Object/1.0.0.0": {
+      "DiGi.Core/1.0.0.0": {
         "runtime": {
-          "DiGi.Geometry.Object.dll": {
+          "DiGi.Core.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
@@ -162,7 +185,7 @@
     }
   },
   "libraries": {
-    "DiGi.Geometry.Visual/1.0.0": {
+    "DiGi.Geometry.Object/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -173,6 +196,13 @@
       "sha512": "sha512-owmu2Cr3IQ8yQiBleBHlGk8dSQ12oaF2e7TpzwJKEl4m84kkZJjEY1n33L67Y3zM5jPOjmmbdHjbfiL0RqcMRQ==",
       "path": "microsoft.bcl.asyncinterfaces/9.0.0",
       "hashPath": "microsoft.bcl.asyncinterfaces.9.0.0.nupkg.sha512"
+    },
+    "Microsoft.CSharp/4.7.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-pTj+D3uJWyN3My70i2Hqo+OXixq3Os2D1nJ2x92FFo6sk8fYS1m1WLNTs0Dc1uPaViH0YvEEwvzddQ7y4rhXmA==",
+      "path": "microsoft.csharp/4.7.0",
+      "hashPath": "microsoft.csharp.4.7.0.nupkg.sha512"
     },
     "Microsoft.NETCore.Platforms/1.1.0": {
       "type": "package",
@@ -187,6 +217,20 @@
       "sha512": "sha512-st47PosZSHrjECdjeIzZQbzivYBJFv6P2nv4cj2ypdI204DO+vZ7l5raGMiX4eXMJ53RfOIg+/s4DHVZ54Nu2A==",
       "path": "netstandard.library/2.0.3",
       "hashPath": "netstandard.library.2.0.3.nupkg.sha512"
+    },
+    "NetTopologySuite/2.5.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-5/+2O2ADomEdUn09mlSigACdqvAf0m/pVPGtIPEPQWnyrVykYY0NlfXLIdkMgi41kvH9kNrPqYaFBTZtHYH7Xw==",
+      "path": "nettopologysuite/2.5.0",
+      "hashPath": "nettopologysuite.2.5.0.nupkg.sha512"
+    },
+    "QuikGraph/2.5.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-sG+mrPpXwxlXknRK5VqWUGiOmDACa9X+3ftlkQIMgOZUqxVOQSe0+HIU9PTjwqazy0pqSf8MPDXYFGl0GYWcKw==",
+      "path": "quikgraph/2.5.0",
+      "hashPath": "quikgraph.2.5.0.nupkg.sha512"
     },
     "System.Buffers/4.5.1": {
       "type": "package",
@@ -244,17 +288,12 @@
       "path": "system.threading.tasks.extensions/4.5.4",
       "hashPath": "system.threading.tasks.extensions.4.5.4.nupkg.sha512"
     },
+    "DiGi.Geometry/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
     "DiGi.Core/1.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "DiGi.Geometry/1.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "DiGi.Geometry.Object/1.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
